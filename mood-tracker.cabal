@@ -88,7 +88,7 @@ common shared
     , time
     , with-utf8
     , warp
-    , , warp
+    , warp
     , http-types
     , wai
     , bytestring
