@@ -25,13 +25,16 @@ fileToByte = Relude.readFileBS
 byteToText :: ByteString -> Text
 byteToText = Relude.decodeUtf8
 
+{-
 filterDays :: Text -> Text
 filterDays x =
   Relude.unlines $ Relude.filter (\w -> w `notElem` ["[", "]", "Mon", "Thu", "Wen", "Thr", "Fri", "Sat", "Sun"]) (Relude.lines x)
+-}
 
 filterMoods :: Text -> Text
 filterMoods x =
-  Relude.unlines $ Relude.filter (\w -> w `Prelude.elem` ["Good", "Neutral", "Bad", "Great", "Excellent"]) (Relude.lines x)
+  Relude.unlines $ Relude.filter (\w -> w `Prelude.elem` ["good", "neutral", "bad", "great", "excellent"]) (Relude.lines x)
+
 
 moodChecker :: Text -> Mood
 moodChecker x
@@ -44,17 +47,28 @@ moodChecker x
 moodList :: [Text] -> [Mood]
 moodList = fmap moodChecker
 
+
+
+timeFilter' :: Text -> Text
+timeFilter' x =
+  Relude.unwords $ Relude.filter (\w -> w `notElem` ["good", "netural", "bad", "great", "excellent", "[", "]", "Mon", "Tus", "Wen", "Thu", "Fri", "Sat", "Sun"]) (words x)
+
+
+timeFilter :: Text -> [Text]
+timeFilter x =
+  Relude.filter (\w -> w  `notElem` ["good", "netural", "bad", "great", "excellent", "[", "]", "Mon", "Tus", "Wen", "Thu", "Fri", "Sat", "Sun"]) (words x)
+
 timeList :: Text -> UTCTime
 timeList x =
-  let filteredList = show (Relude.filter (\w -> w `notElem` ["good", "netural", "bad"]) [x])
-   in parseTimeOrError True defaultTimeLocale "%F %H:%M" filteredList :: UTCTime
+  let filteredList = toString $ Relude.unlines $ timeFilter x
+    in parseTimeOrError True defaultTimeLocale "%F %H:%M" filteredList :: UTCTime
 
 moodParse :: (UTCTime, Mood) -> MoodEntry
 moodParse (x, y) = MoodEntry x y
 
 moodParser :: Text -> [MoodEntry]
 moodParser x =
-  let targetList = words x
+  let targetList = lines x
       time = fmap timeList targetList
       moods = fmap filterMoods targetList
       mList = moodList moods
@@ -72,7 +86,7 @@ renderMoods :: [MoodEntry] -> H.Html
 renderMoods moods =
   H.docTypeHtml $ do
     H.body $ do
-      H.h1 "Why"
+      H.h1 "Hello"
       H.meta H.! charset "UTF-8"
       H.ul $ do
         mapM_ H.li $ fmap renderMood moods
@@ -96,4 +110,4 @@ app _request respond = do
 
 main :: IO ()
 main = do
-  runApp 3000
+  runApp 5000
