@@ -1,9 +1,5 @@
 module Main where
 
-import Main.Utf8 qualified as Utf8
-
-import Data.Text as T (lines, unlines)
-import Data.Text.Encoding as TE (decodeUtf8)
 import Data.Time (UTCTime, defaultTimeLocale, parseTimeOrError)
 import Network.HTTP.Types (status200)
 import Network.Wai (Application, responseLBS)
@@ -27,15 +23,15 @@ fileToByte :: MonadIO m => FilePath -> m ByteString
 fileToByte = Relude.readFileBS
 
 byteToText :: ByteString -> Text
-byteToText = TE.decodeUtf8
+byteToText = Relude.decodeUtf8
 
 filterDays :: Text -> Text
 filterDays x =
-  Relude.unlines $ Relude.filter (\w -> w `notElem` ["[", "]", "Mon", "Thu", "Wen", "Thr", "Fri", "Sat", "Sun"]) (T.lines x)
+  Relude.unlines $ Relude.filter (\w -> w `notElem` ["[", "]", "Mon", "Thu", "Wen", "Thr", "Fri", "Sat", "Sun"]) (Relude.lines x)
 
 filterMoods :: Text -> Text
 filterMoods x =
-  T.unlines $ Relude.filter (\w -> w `Prelude.elem` ["Good", "Neutral", "Bad", "Great", "Excellent"]) (T.lines x)
+  Relude.unlines $ Relude.filter (\w -> w `Prelude.elem` ["Good", "Neutral", "Bad", "Great", "Excellent"]) (Relude.lines x)
 
 moodChecker :: Text -> Mood
 moodChecker x
