@@ -35,7 +35,6 @@ filterMoods :: Text -> Text
 filterMoods x =
   Relude.unlines $ Relude.filter (\w -> w `Prelude.elem` ["good", "neutral", "bad", "great", "excellent"]) (Relude.lines x)
 
-
 moodChecker :: Text -> Mood
 moodChecker x
   | x == "Good" = Good
@@ -47,21 +46,18 @@ moodChecker x
 moodList :: [Text] -> [Mood]
 moodList = fmap moodChecker
 
-
-
 timeFilter' :: Text -> Text
 timeFilter' x =
   Relude.unwords $ Relude.filter (\w -> w `notElem` ["good", "netural", "bad", "great", "excellent", "[", "]", "Mon", "Tus", "Wen", "Thu", "Fri", "Sat", "Sun"]) (words x)
 
-
 timeFilter :: Text -> [Text]
 timeFilter x =
-  Relude.filter (\w -> w  `notElem` ["good", "netural", "bad", "great", "excellent", "[", "]", "Mon", "Tus", "Wen", "Thu", "Fri", "Sat", "Sun"]) (words x)
+  Relude.filter (\w -> w `notElem` ["good", "netural", "bad", "great", "excellent", "[", "]", "Mon", "Tus", "Wen", "Thu", "Fri", "Sat", "Sun"]) (words x)
 
 timeList :: Text -> UTCTime
 timeList x =
   let filteredList = toString $ Relude.unlines $ timeFilter x
-    in parseTimeOrError True defaultTimeLocale "%F %H:%M" filteredList :: UTCTime
+   in parseTimeOrError True defaultTimeLocale "%F %H:%M" filteredList :: UTCTime
 
 moodParse :: (UTCTime, Mood) -> MoodEntry
 moodParse (x, y) = MoodEntry x y
