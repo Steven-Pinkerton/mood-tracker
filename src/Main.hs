@@ -1,5 +1,6 @@
 module Main where
 
+import Data.Aeson qualified as DA
 import Data.Time (UTCTime, defaultTimeLocale, parseTimeOrError)
 import Network.HTTP.Types (status200)
 import Network.Wai (Application, responseLBS)
@@ -8,7 +9,6 @@ import Relude.List.Reexport ()
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
 import Text.Blaze.Html5 qualified as H
 import Text.Blaze.Html5.Attributes (charset)
-import Data.Aeson qualified as DA
 
 data Mood = Bad | Netural | Good | Great | Excellent
   deriving stock (Show, Eq)
@@ -19,13 +19,11 @@ data MoodEntry = MoodEntry
   }
   deriving stock (Show, Eq)
 
-
 {-
 filterDays :: Text -> Text
 filterDays x =
   Relude.unlines $ Relude.filter (\w -> w `notElem` ["[", "]", "Mon", "Thu", "Wen", "Thr", "Fri", "Sat", "Sun"]) (Relude.lines x)
 -}
-
 
 filterMoods :: Text -> Text
 filterMoods x =
@@ -51,7 +49,6 @@ timeList :: Text -> UTCTime
 timeList x =
   let filteredList = toString $ unlines $ timeFilter x
    in parseTimeOrError True defaultTimeLocale "%F %H:%M" filteredList :: UTCTime
-
 
 --Delete this in favour of uncurry.
 moodParse :: (UTCTime, Mood) -> MoodEntry
