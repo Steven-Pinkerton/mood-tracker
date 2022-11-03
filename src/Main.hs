@@ -1,11 +1,12 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Main where
 
-import Data.Aeson (FromJSON, ToJSON)
-import Data.Aeson.Types ()
+import Data.Aeson (FromJSON, Object, ToJSON, withObject, (.:))
+import Data.Aeson.Types (FromJSON (parseJSON))
 import Data.Time (UTCTime, defaultTimeLocale, parseTimeOrError)
 import GHC.Generics ()
 import Network.HTTP.Types (status200)
@@ -30,6 +31,25 @@ data MoodEntry = MoodEntry
 
 instance FromJSON MoodEntry
 instance ToJSON MoodEntry
+
+data MoodRecord = MoodRecord
+  { mood :: Mood
+  , when :: UTCTime
+  }
+  deriving stock (Show, Eq, Generic)
+
+instance FromJSON MoodRecord where
+  parseJSON = withObject "MoodRecord" $ \o -> do
+    mood <- o .: "mood"
+    when <- o .: "when"
+    return MoodRecord {..}
+
+{-
+
+exampleFunction :: ByteString -> [MoodEntry]
+exampleFunction x =
+  let parser = error "asd"
+-}
 
 filterMoods :: Text -> Text
 filterMoods x =
@@ -97,7 +117,7 @@ runApp port = do
 -- | This creates a web-server.
 app :: Application
 app _request respond = do
-  targetFile <- readFileBS "src/moods.txt"
+  targetFile <- readFileBS "src/moods.jsonl"
   let moodlist = parseMoodEntries $ decodeUtf8 targetFile
       response = renderHtml $ renderMoods moodlist
   respond $ responseLBS status200 [] response
