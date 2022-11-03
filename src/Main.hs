@@ -1,6 +1,10 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
+
 module Main where
 
-import Data.Aeson qualified as DA
+import GHC.Generics ()
 import Data.Time (UTCTime, defaultTimeLocale, parseTimeOrError)
 import Network.HTTP.Types (status200)
 import Network.Wai (Application, responseLBS)
@@ -9,21 +13,25 @@ import Relude.List.Reexport ()
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
 import Text.Blaze.Html5 qualified as H
 import Text.Blaze.Html5.Attributes (charset)
+import Data.Aeson (FromJSON, ToJSON)
+import Data.Aeson.Types ()
 
 data Mood = Bad | Netural | Good | Great | Excellent
-  deriving stock (Show, Eq)
+  deriving stock (Show, Eq, Generic)
+
+instance FromJSON Mood
+instance ToJSON Mood
 
 data MoodEntry = MoodEntry
   { moodWhen :: UTCTime
   , moodWhat :: Mood
   }
-  deriving stock (Show, Eq)
+  deriving stock (Show, Eq, Generic)
 
-{-
-filterDays :: Text -> Text
-filterDays x =
-  Relude.unlines $ Relude.filter (\w -> w `notElem` ["[", "]", "Mon", "Thu", "Wen", "Thr", "Fri", "Sat", "Sun"]) (Relude.lines x)
--}
+instance FromJSON MoodEntry
+instance ToJSON MoodEntry
+
+
 
 filterMoods :: Text -> Text
 filterMoods x =
