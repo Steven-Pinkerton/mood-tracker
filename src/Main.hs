@@ -1,11 +1,13 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
-import GHC.Generics ()
+import Data.Aeson (FromJSON, ToJSON)
+import Data.Aeson.Types ()
 import Data.Time (UTCTime, defaultTimeLocale, parseTimeOrError)
+import GHC.Generics ()
 import Network.HTTP.Types (status200)
 import Network.Wai (Application, responseLBS)
 import Network.Wai.Handler.Warp (run)
@@ -13,8 +15,6 @@ import Relude.List.Reexport ()
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
 import Text.Blaze.Html5 qualified as H
 import Text.Blaze.Html5.Attributes (charset)
-import Data.Aeson (FromJSON, ToJSON)
-import Data.Aeson.Types ()
 
 data Mood = Bad | Netural | Good | Great | Excellent
   deriving stock (Show, Eq, Generic)
@@ -30,8 +30,6 @@ data MoodEntry = MoodEntry
 
 instance FromJSON MoodEntry
 instance ToJSON MoodEntry
-
-
 
 filterMoods :: Text -> Text
 filterMoods x =
