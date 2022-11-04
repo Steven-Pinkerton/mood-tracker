@@ -2,11 +2,16 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Replace case with maybe" #-}
 
 module Main where
 
-import Data.Aeson (FromJSON, Object, ToJSON, withObject, (.:))
+import Data.Aeson (FromJSON, Object, ToJSON, decode, fromJSON, withObject, (.:))
 import Data.Aeson.Types (FromJSON (parseJSON))
+import Data.ByteString.Lazy qualified as B
+import Data.Maybe (fromJust)
 import Data.Time (UTCTime, defaultTimeLocale, parseTimeOrError)
 import GHC.Generics ()
 import Network.HTTP.Types (status200)
@@ -38,18 +43,27 @@ data MoodRecord = MoodRecord
   }
   deriving stock (Show, Eq, Generic)
 
+-- This will when applied to the file give us. MoodRecord {Good, 2022-10-09 Sun 11:51}.
+-- FromJSON is in effect read but for JSON, as opposed to Read which is for strings.
+-- The Alteratnive is to use decode. However
 instance FromJSON MoodRecord where
-  parseJSON = withObject "MoodRecord" $ \o -> do
+  parseJSON = withObject "moodRecord" $ \o -> do
     mood <- o .: "mood"
     when <- o .: "when"
     return MoodRecord {..}
 
-{-
+--
+getJSON :: FilePath -> IO B.ByteString
+getJSON = readFileLBS
 
-exampleFunction :: ByteString -> [MoodEntry]
-exampleFunction x =
-  let parser = error "asd"
--}
+--This gives up a MoodRecord  let MoodRecord = FromJSON x :: MoodRecord
+moodParse' :: B.ByteString -> Maybe MoodRecord
+moodParse' x =
+  case decode x of
+    Just record -> pure record
+    Nothing -> Nothing
+
+--This function applies
 
 filterMoods :: Text -> Text
 filterMoods x =
@@ -74,7 +88,7 @@ timeFilter x =
 timeList :: Text -> UTCTime
 timeList x =
   let filteredList = toString $ unlines $ timeFilter x
-   in parseTimeOrError True defaultTimeLocale "%F %H:%M" filteredList :: UTCTime
+   in parseTimeOrError True defaultTimeLocale "%F %a %H:%M" filteredList :: UTCTime
 
 --Delete this in favour of uncurry.
 moodParse :: (UTCTime, Mood) -> MoodEntry
