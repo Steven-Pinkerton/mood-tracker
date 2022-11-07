@@ -4,7 +4,7 @@
 
 module Main where
 
-import Data.Aeson (FromJSON, ToJSON, decode)
+import Data.Aeson (FromJSON (parseJSON), ToJSON, decode, withObject, (.:))
 import Data.ByteString.Lazy qualified as B
 import Data.Maybe (fromJust)
 import Data.Time (UTCTime)
@@ -28,9 +28,13 @@ data MoodEntry = MoodEntry
   , moodWhat :: Mood
   }
   deriving stock (Show, Eq, Generic)
-
-instance FromJSON MoodEntry
 instance ToJSON MoodEntry
+
+instance FromJSON MoodEntry where
+  parseJSON = withObject "moodRecord" $ \o -> do
+    moodWhen <- o .: "when"
+    moodWhat <- o .: "mood"
+    return MoodEntry {..}
 
 --This reads a JSON file
 getJSON :: FilePath -> IO B.ByteString
