@@ -1,18 +1,13 @@
-{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-
-{-# HLINT ignore "Replace case with maybe" #-}
 
 module Main where
 
-import Data.Aeson (FromJSON, Object, ToJSON, decode, fromJSON, withObject, (.:))
-import Data.Aeson.Types (FromJSON (parseJSON))
+import Data.Aeson (FromJSON, ToJSON, decode)
 import Data.ByteString.Lazy qualified as B
 import Data.Maybe (fromJust)
-import Data.Time (UTCTime, defaultTimeLocale, parseTimeOrError)
+import Data.Time (UTCTime)
 import GHC.Generics ()
 import Network.HTTP.Types (status200)
 import Network.Wai (Application, responseLBS)
@@ -37,81 +32,31 @@ data MoodEntry = MoodEntry
 instance FromJSON MoodEntry
 instance ToJSON MoodEntry
 
-data MoodRecord = MoodRecord
-  { mood :: Mood
-  , when :: UTCTime
-  }
-  deriving stock (Show, Eq, Generic)
-
--- This will when applied to the file give us. MoodRecord {Good, 2022-10-09 Sun 11:51}.
--- FromJSON is in effect read but for JSON, as opposed to Read which is for strings.
--- The Alteratnive is to use decode. However
-instance FromJSON MoodRecord where
-  parseJSON = withObject "moodRecord" $ \o -> do
-    mood <- o .: "mood"
-    when <- o .: "when"
-    return MoodRecord {..}
-
---
+--This reads a JSON file
 getJSON :: FilePath -> IO B.ByteString
 getJSON = readFileLBS
 
---This gives up a MoodRecord  let MoodRecord = FromJSON x :: MoodRecord
-moodParse' :: B.ByteString -> Maybe MoodRecord
-moodParse' x =
-  case decode x of
-    Just record -> pure record
-    Nothing -> Nothing
+--This gives up a MoodRecord when provided with a lazy bytestring of the correct format.
+moodParse' :: B.ByteString -> Maybe MoodEntry
+moodParse' x = decode x :: Maybe MoodEntry
 
---This function applies
+--This tests if the Maybe MoodRecord supplied contains a Just value or Nothing.
+testForNothing :: Maybe MoodEntry -> Bool
+testForNothing x =
+  case x of
+    Just _ -> True
+    Nothing -> False
 
-filterMoods :: Text -> Text
-filterMoods x =
-  unlines $ filter (\w -> w `elem` ["good", "neutral", "bad", "great", "excellent"]) (lines x)
+fromResult :: Maybe MoodEntry -> MoodEntry
+fromResult = fromJust
 
-parseMood :: Text -> Mood
-parseMood x
-  | x == "Good" = Good
-  | x == "Nutral" = Netural
-  | x == "Bad" = Bad
-  | x == "Excellent" = Excellent
-  | otherwise = error "Nothing has been provided"
-
-timeFilter' :: Text -> Text
-timeFilter' x =
-  unwords $ filter (\w -> w `notElem` ["good", "netural", "bad", "great", "excellent", "[", "]", "Mon", "Tus", "Wen", "Thu", "Fri", "Sat", "Sun"]) (words x)
-
-timeFilter :: Text -> [Text]
-timeFilter x =
-  filter (\w -> w `notElem` ["good", "netural", "bad", "great", "excellent", "[", "]", "Mon", "Tus", "Wen", "Thu", "Fri", "Sat", "Sun"]) (words x)
-
-timeList :: Text -> UTCTime
-timeList x =
-  let filteredList = toString $ unlines $ timeFilter x
-   in parseTimeOrError True defaultTimeLocale "%F %a %H:%M" filteredList :: UTCTime
-
---Delete this in favour of uncurry.
-moodParse :: (UTCTime, Mood) -> MoodEntry
-moodParse (x, y) = MoodEntry x y
-
-parseMoodEntries :: Text -> [MoodEntry]
-parseMoodEntries x =
-  let inputList = lines x
-      time = fmap timeList inputList
-      moods = fmap filterMoods inputList
-      mList = fmap parseMood moods
-      ziped = zip time mList
-   in fmap feederToParser ziped
-
-feederToParser :: (UTCTime, Mood) -> MoodEntry
-feederToParser x =
-  let time = fst x
-      mood = snd x
-   in MoodEntry time mood
+--This function applies moodParse' to get a MoodEntry
+applyParse' :: MoodEntry -> [MoodEntry]
+applyParse' x = [MoodEntry (moodWhen x) (moodWhat x)]
 
 -- | This serves Html to an application.
-renderMoods :: [MoodEntry] -> H.Html
-renderMoods moods =
+renderMoods' :: [MoodEntry] -> H.Html
+renderMoods' moods =
   H.docTypeHtml $ do
     H.body $ do
       H.h1 "Hello"
@@ -119,23 +64,20 @@ renderMoods moods =
       H.ul $ do
         mapM_ H.li $ fmap renderMood moods
 
+app' :: Application
+app' _request respond = do
+  targetFile <- getJSON "src/oneMood.jsonl"
+  let moodlist = moodParse' targetFile
+      response = renderHtml $ renderMoods' $ applyParse' $ fromResult moodlist
+   in respond $ responseLBS status200 [] response
+
 renderMood :: MoodEntry -> H.Html
 renderMood = show
 
--- | This runs a web application, at the given port.
-runApp :: Int -> IO ()
-runApp port = do
-  Prelude.putStrLn $ "Running HTTP server at http://127.0.0.1:" <> show port
-  run port app
-
--- | This creates a web-server.
-app :: Application
-app _request respond = do
-  targetFile <- readFileBS "src/moods.jsonl"
-  let moodlist = parseMoodEntries $ decodeUtf8 targetFile
-      response = renderHtml $ renderMoods moodlist
-  respond $ responseLBS status200 [] response
-
 main :: IO ()
 main = do
-  runApp 5000
+  targetFile <- getJSON "src/oneMood.jsonl"
+  let moodList = moodParse' targetFile
+   in if testForNothing moodList
+        then run 5000 app'
+        else putStrLn "The file supplied is malformed"
