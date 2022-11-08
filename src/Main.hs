@@ -4,7 +4,7 @@
 
 module Main where
 
-import Data.Aeson (FromJSON (parseJSON), ToJSON, decode, withObject, (.:))
+import Data.Aeson (FromJSON (parseJSON), ToJSON, decode, eitherDecode, withObject, (.:))
 import Data.ByteString.Lazy qualified as B
 import Data.Maybe (fromJust)
 import Data.Time (UTCTime)
@@ -18,7 +18,7 @@ import Text.Blaze.Html5 qualified as H
 import Text.Blaze.Html5.Attributes (charset)
 
 data Mood = Bad | Netural | Good | Great | Excellent
-  deriving stock (Show, Eq, Generic)
+  deriving stock (Show, Eq, Read, Generic)
 
 instance FromJSON Mood
 instance ToJSON Mood
@@ -41,8 +41,8 @@ getJSON :: FilePath -> IO B.ByteString
 getJSON = readFileLBS
 
 --This gives up a MoodRecord when provided with a lazy bytestring of the correct format.
-moodParse' :: B.ByteString -> Maybe MoodEntry
-moodParse' x = decode x :: Maybe MoodEntry
+moodParse' :: B.ByteString -> Either String MoodEntry
+moodParse' = eitherDecode
 
 --This tests if the Maybe MoodRecord supplied contains a Just value or Nothing.
 testForNothing :: Maybe MoodEntry -> Bool
@@ -51,12 +51,15 @@ testForNothing x =
     Just _ -> True
     Nothing -> False
 
-fromResult :: Maybe MoodEntry -> MoodEntry
+--This removes the value from Maybe
+--Due to tests in main catching any malformed data prior to being introduced to the function.
+{- fromResult :: MoodEntry -> MoodEntry
 fromResult = fromJust
+-}
 
---This function applies moodParse' to get a MoodEntry
-applyParse' :: MoodEntry -> [MoodEntry]
-applyParse' x = [MoodEntry (moodWhen x) (moodWhat x)]
+--This function creates a list of [MoodEntry] from a MoodEntry.
+listMoods' :: MoodEntry -> [MoodEntry]
+listMoods' x = [MoodEntry (moodWhen x) (moodWhat x)]
 
 -- | This serves Html to an application.
 renderMoods' :: [MoodEntry] -> H.Html
@@ -68,20 +71,28 @@ renderMoods' moods =
       H.ul $ do
         mapM_ H.li $ fmap renderMood moods
 
+renderMood :: MoodEntry -> H.Html
+renderMood = show
+
+-- | This runs a web application, at the given port.
+
+{- runApp :: Int -> IO ()
+runApp port = do
+  Prelude.putStrLn $ "Running HTTP server at http://127.0.0.1:" <> show port
+  run port app'
+
 app' :: Application
 app' _request respond = do
   targetFile <- getJSON "src/oneMood.jsonl"
   let moodlist = moodParse' targetFile
-      response = renderHtml $ renderMoods' $ applyParse' $ fromResult moodlist
+      response = renderHtml $ renderMoods' $ listMoods' moodlist
    in respond $ responseLBS status200 [] response
-
-renderMood :: MoodEntry -> H.Html
-renderMood = show
+-}
 
 main :: IO ()
 main = do
   targetFile <- getJSON "src/oneMood.jsonl"
   let moodList = moodParse' targetFile
-   in if testForNothing moodList
-        then run 5000 app'
-        else putStrLn "The file supplied is malformed"
+   in case moodList of
+        Right success -> print success
+        Left err -> print err
