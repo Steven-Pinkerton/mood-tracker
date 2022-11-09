@@ -43,13 +43,17 @@ instance FromJSON MoodEntry where
 getJSON :: FilePath -> IO B.ByteString
 getJSON = readFileLBS
 
+moodParse :: B.ByteString -> Maybe MoodEntry
+moodParse = decode
+
 --This gives up a MoodRecord when provided with a lazy bytestring of the correct format.
 moodParse' :: B.ByteString -> Either String MoodEntry
 moodParse' = eitherDecode
 
---Consider Traversal, build it with regards to moodPrase
+{---Consider Traversal, build it with regards to moodPrase
 moodParse2 :: B.ByteString -> Either [String] [MoodEntry]
 moodParse2 = error ""
+-}
 
 --This tests if the Maybe MoodRecord supplied contains a Just value or Nothing.
 testForNothing :: Maybe MoodEntry -> Bool
@@ -57,12 +61,6 @@ testForNothing x =
   case x of
     Just _ -> True
     Nothing -> False
-
---This removes the value from Maybe
---Due to tests in main catching any malformed data prior to being introduced to the function.
-{- fromResult :: MoodEntry -> MoodEntry
-fromResult = fromJust
--}
 
 --This function creates a list of [MoodEntry] from a MoodEntry.
 listMoods' :: MoodEntry -> [MoodEntry]
@@ -73,7 +71,7 @@ renderMoods' :: [MoodEntry] -> H.Html
 renderMoods' moods =
   H.docTypeHtml $ do
     H.body $ do
-      H.h1 "Hello"
+      H.h1 "Moods"
       H.meta H.! charset "UTF-8"
       H.ul $ do
         mapM_ H.li $ fmap renderMood moods
@@ -82,8 +80,7 @@ renderMood :: MoodEntry -> H.Html
 renderMood = show
 
 -- | This runs a web application, at the given port.
-
-{- runApp :: Int -> IO ()
+runApp :: Int -> IO ()
 runApp port = do
   Prelude.putStrLn $ "Running HTTP server at http://127.0.0.1:" <> show port
   run port app'
@@ -91,15 +88,14 @@ runApp port = do
 app' :: Application
 app' _request respond = do
   targetFile <- getJSON "src/oneMood.jsonl"
-  let moodlist = moodParse' targetFile
+  let moodlist = fromJust $ moodParse targetFile
       response = renderHtml $ renderMoods' $ listMoods' moodlist
    in respond $ responseLBS status200 [] response
--}
 
 main :: IO ()
 main = do
   targetFile <- getJSON "src/oneMood.jsonl"
   let moodList = moodParse' targetFile
    in case moodList of
-        Right success -> print success
+        Right success -> runApp 5000
         Left err -> print err
