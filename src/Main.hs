@@ -39,10 +39,6 @@ instance FromJSON MoodEntry where
     moodWhen <- parseTimeM False defaultTimeLocale "%Y-%m-%d %a %H:%M" when
     return MoodEntry {moodWhen, moodWhat}
 
---This reads a JSON file
-getJSON :: FilePath -> IO B.ByteString
-getJSON = readFileLBS
-
 --This gives up a MoodRecord when provided with a lazy bytestring of the correct format.
 moodParse' :: B.ByteString -> Either String MoodEntry
 moodParse' = eitherDecode
@@ -77,14 +73,14 @@ runApp port = do
 
 app' :: Application
 app' _request respond = do
-  targetFile <- getJSON "src/oneMood.jsonl"
+  targetFile <- readFileLBS "src/oneMood.jsonl"
   let moodlist = fromJust $ decode targetFile
       response = renderHtml $ renderMoods' $ listMoods' moodlist
    in respond $ responseLBS status200 [] response
 
 main :: IO ()
 main = do
-  targetFile <- getJSON "src/oneMood.jsonl"
+  targetFile <- readFileLBS "src/oneMood.jsonl"
   let moodList = moodParse' targetFile
    in case moodList of
         Right success -> runApp 5000
