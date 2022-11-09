@@ -55,13 +55,6 @@ moodParse2 :: B.ByteString -> Either [String] [MoodEntry]
 moodParse2 = error ""
 -}
 
---This tests if the Maybe MoodRecord supplied contains a Just value or Nothing.
-testForNothing :: Maybe MoodEntry -> Bool
-testForNothing x =
-  case x of
-    Just _ -> True
-    Nothing -> False
-
 --This function creates a list of [MoodEntry] from a MoodEntry.
 listMoods' :: MoodEntry -> [MoodEntry]
 listMoods' x = [MoodEntry (moodWhen x) (moodWhat x)]
