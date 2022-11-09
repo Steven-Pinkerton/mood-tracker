@@ -60,10 +60,7 @@ renderMoods' moods =
       H.h1 "Moods"
       H.meta H.! charset "UTF-8"
       H.ul $ do
-        mapM_ H.li $ fmap renderMood moods
-
-renderMood :: MoodEntry -> H.Html
-renderMood = show
+        mapM_ H.li $ fmap show moods
 
 -- | This runs a web application, at the given port.
 runApp :: Int -> IO ()
