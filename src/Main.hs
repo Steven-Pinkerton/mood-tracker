@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
@@ -7,7 +8,7 @@ module Main where
 import Data.Aeson (FromJSON (parseJSON), ToJSON, decode, eitherDecode, withObject, (.:))
 import Data.ByteString.Lazy qualified as B
 import Data.Maybe (fromJust)
-import Data.Time (UTCTime)
+import Data.Time (UTCTime, defaultTimeLocale, parseTimeM)
 import GHC.Generics ()
 import Network.HTTP.Types (status200)
 import Network.Wai (Application, responseLBS)
@@ -30,11 +31,13 @@ data MoodEntry = MoodEntry
   deriving stock (Show, Eq, Generic)
 instance ToJSON MoodEntry
 
+--We can alter this to do more then just instantly derive a UTCTime. Alternatively we can alter the format of the file itself.
 instance FromJSON MoodEntry where
   parseJSON = withObject "moodRecord" $ \o -> do
-    moodWhen <- o .: "when"
+    when <- o .: "when"
     moodWhat <- o .: "mood"
-    return MoodEntry {..}
+    moodWhen <- parseTimeM False defaultTimeLocale "%Y-%m-%d %a %H:%M" when
+    return MoodEntry {moodWhen, moodWhat}
 
 --This reads a JSON file
 getJSON :: FilePath -> IO B.ByteString
@@ -43,6 +46,10 @@ getJSON = readFileLBS
 --This gives up a MoodRecord when provided with a lazy bytestring of the correct format.
 moodParse' :: B.ByteString -> Either String MoodEntry
 moodParse' = eitherDecode
+
+--Consider Traversal, build it with regards to moodPrase
+moodParse2 :: B.ByteString -> Either [String] [MoodEntry]
+moodParse2 = error ""
 
 --This tests if the Maybe MoodRecord supplied contains a Just value or Nothing.
 testForNothing :: Maybe MoodEntry -> Bool
