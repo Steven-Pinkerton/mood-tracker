@@ -43,9 +43,6 @@ instance FromJSON MoodEntry where
 getJSON :: FilePath -> IO B.ByteString
 getJSON = readFileLBS
 
-moodParse :: B.ByteString -> Maybe MoodEntry
-moodParse = decode
-
 --This gives up a MoodRecord when provided with a lazy bytestring of the correct format.
 moodParse' :: B.ByteString -> Either String MoodEntry
 moodParse' = eitherDecode
@@ -81,7 +78,7 @@ runApp port = do
 app' :: Application
 app' _request respond = do
   targetFile <- getJSON "src/oneMood.jsonl"
-  let moodlist = fromJust $ moodParse targetFile
+  let moodlist = fromJust $ decode targetFile
       response = renderHtml $ renderMoods' $ listMoods' moodlist
    in respond $ responseLBS status200 [] response
 
