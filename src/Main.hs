@@ -7,7 +7,7 @@ module Main where
 
 import Data.Aeson (FromJSON (parseJSON), ToJSON, decode, eitherDecode, withObject, (.:))
 import Data.ByteString.Lazy qualified as B
-import Data.Maybe (fromJust)
+import Data.ByteString.Lazy.Char8 qualified as BL
 import Data.Time (UTCTime, defaultTimeLocale, parseTimeM)
 import GHC.Generics ()
 import Network.HTTP.Types (status200)
@@ -18,7 +18,7 @@ import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
 import Text.Blaze.Html5 qualified as H
 import Text.Blaze.Html5.Attributes (charset)
 
-data Mood = Bad | Netural | Good | Great | Excellent
+data Mood = Bad | Neutral | Good | Great | Excellent
   deriving stock (Show, Eq, Read, Generic)
 
 instance FromJSON Mood
@@ -39,22 +39,18 @@ instance FromJSON MoodEntry where
     moodWhen <- parseTimeM False defaultTimeLocale "%Y-%m-%d %a %H:%M" when
     return MoodEntry {moodWhen, moodWhat}
 
---This gives up a MoodRecord when provided with a lazy bytestring of the correct format.
-moodParse' :: B.ByteString -> Either String MoodEntry
-moodParse' = eitherDecode
+--Consider Traversal, build it with regards to moodPrase
+moodParse :: B.ByteString -> Either String [MoodEntry]
+moodParse x =  traverse eitherDecode (BL.lines x)
 
-{---Consider Traversal, build it with regards to moodPrase
-moodParse2 :: B.ByteString -> Either [String] [MoodEntry]
-moodParse2 = error ""
--}
 
 --This function creates a list of [MoodEntry] from a MoodEntry.
 listMoods' :: MoodEntry -> [MoodEntry]
 listMoods' x = [MoodEntry (moodWhen x) (moodWhat x)]
 
 -- | This serves Html to an application.
-renderMoods' :: [MoodEntry] -> H.Html
-renderMoods' moods =
+renderMoods' :: Either String [MoodEntry] -> H.Html
+renderMoods' moods = 
   H.docTypeHtml $ do
     H.body $ do
       H.h1 "Moods"
@@ -70,15 +66,15 @@ runApp port = do
 
 app' :: Application
 app' _request respond = do
-  targetFile <- readFileLBS "src/oneMood.jsonl"
-  let moodlist = fromJust $ decode targetFile
-      response = renderHtml $ renderMoods' $ listMoods' moodlist
+  targetFile <- readFileLBS "src/moods.jsonl"
+  let listOfMoods = moodParse targetFile
+      response = renderHtml $ renderMoods' listOfMoods
    in respond $ responseLBS status200 [] response
 
 main :: IO ()
 main = do
-  targetFile <- readFileLBS "src/oneMood.jsonl"
-  let moodList = moodParse' targetFile
-   in case moodList of
-        Right success -> runApp 5000
+  targetFile <- readFileLBS "src/moods.jsonl"
+  let listOfMoods = moodParse targetFile
+   in case listOfMoods of
+        Right success -> runApp 7000
         Left err -> print err
