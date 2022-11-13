@@ -41,8 +41,7 @@ instance FromJSON MoodEntry where
 
 --Consider Traversal, build it with regards to moodPrase
 moodParse :: B.ByteString -> Either String [MoodEntry]
-moodParse x =  traverse eitherDecode (BL.lines x)
-
+moodParse x = traverse eitherDecode (BL.lines x)
 
 --This function creates a list of [MoodEntry] from a MoodEntry.
 listMoods' :: MoodEntry -> [MoodEntry]
@@ -50,7 +49,7 @@ listMoods' x = [MoodEntry (moodWhen x) (moodWhat x)]
 
 -- | This serves Html to an application.
 renderMoods' :: Either String [MoodEntry] -> H.Html
-renderMoods' moods = 
+renderMoods' moods =
   H.docTypeHtml $ do
     H.body $ do
       H.h1 "Moods"
