@@ -4,9 +4,6 @@ import Network.HTTP.Types (status200)
 import Network.Wai (Application, responseLBS)
 import Network.Wai.Handler.Warp (run)
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
-import Text.Blaze.Html5 qualified as H
-import Text.Blaze.Html5.Attributes (charset)
-
 import MoodTracker.HTML (renderMoods')
 import MoodTracker.Parser (moodParse)
 
