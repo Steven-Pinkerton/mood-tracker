@@ -27,7 +27,7 @@ common shared
     -Wmissing-deriving-strategies -Wunused-foralls -Wunused-foralls
     -fprint-explicit-foralls -fprint-explicit-kinds
 
-  other-modules:
+  exposed-modules:
     MoodTracker.HTML
     MoodTracker.Parser
 
@@ -104,16 +104,18 @@ common shared
   hs-source-dirs:     src
   default-language:   Haskell2010
 
+library
+  import: shared
+
 executable mood-tracker
   import:  shared
   main-is: Main.hs
 
---test-suite my-tests
---  import:         shared
---  main-is:        Spec.hs
---  type:           exitcode-stdio-1.0
---  hs-source-dirs: tests
---  other-modules:  MainSpec
---  build-depends:
---    , hspec
---    , hspec-discover
+test-suite my-tests
+  import:         shared
+  main-is:        Spec.hs
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: tests
+  build-depends:
+    , hspec
+    , hspec-discover
