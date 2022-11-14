@@ -48,10 +48,6 @@ renderMood x = do
   H.span $ do
     H.toHtml (show x :: String)
 
---This function creates a list of [MoodEntry] from a MoodEntry.
-listMoods' :: MoodEntry -> [MoodEntry]
-listMoods' x = [MoodEntry (moodWhen x) (moodWhat x)]
-
 -- | This serves Html to an application.
 renderMoods' :: Either String [MoodEntry] -> H.Html
 renderMoods' moods =
