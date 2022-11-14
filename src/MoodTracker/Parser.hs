@@ -2,7 +2,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-
 module MoodTracker.Parser where
 
 import Data.Aeson (FromJSON (parseJSON), ToJSON, eitherDecode, withObject, (.:))

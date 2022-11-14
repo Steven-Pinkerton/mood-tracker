@@ -1,11 +1,11 @@
 module Main where
 
+import MoodTracker.HTML (renderMoods')
+import MoodTracker.Parser (moodParse)
 import Network.HTTP.Types (status200)
 import Network.Wai (Application, responseLBS)
 import Network.Wai.Handler.Warp (run)
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
-import MoodTracker.HTML (renderMoods')
-import MoodTracker.Parser (moodParse)
 
 -- | This runs a web application, at the given port.
 runApp :: Int -> IO ()
@@ -25,5 +25,5 @@ main = do
   targetFile <- readFileLBS "src/moods.jsonl"
   let listOfMoods = moodParse targetFile
    in case listOfMoods of
-        Right success -> runApp 8000
+        Right _ -> runApp 8000
         Left err -> print err
