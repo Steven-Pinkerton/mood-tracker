@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
+
 
 module MoodTracker.Parser where
 
@@ -28,9 +28,9 @@ instance ToJSON MoodEntry
 --We can alter this to do more then just instantly derive a UTCTime. Alternatively we can alter the format of the file itself.
 instance FromJSON MoodEntry where
   parseJSON = withObject "moodRecord" $ \o -> do
-    when <- o .: "when"
+    when' <- o .: "when"
     moodWhat <- o .: "mood"
-    moodWhen <- parseTimeM False defaultTimeLocale "%Y-%m-%d %a %H:%M" when
+    moodWhen <- parseTimeM False defaultTimeLocale "%Y-%m-%d %a %H:%M" when'
     return MoodEntry {moodWhen, moodWhat}
 
 --Consider Traversal, build it with regards to moodPrase
