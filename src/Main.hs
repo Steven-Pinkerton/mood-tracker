@@ -43,6 +43,11 @@ instance FromJSON MoodEntry where
 moodParse :: B.ByteString -> Either String [MoodEntry]
 moodParse x = traverse eitherDecode (BL.lines x)
 
+renderMood :: MoodEntry -> H.Html
+renderMood x = do
+  H.span $ do
+    H.toHtml (show x :: String)
+
 --This function creates a list of [MoodEntry] from a MoodEntry.
 listMoods' :: MoodEntry -> [MoodEntry]
 listMoods' x = [MoodEntry (moodWhen x) (moodWhat x)]
@@ -50,12 +55,20 @@ listMoods' x = [MoodEntry (moodWhen x) (moodWhat x)]
 -- | This serves Html to an application.
 renderMoods' :: Either String [MoodEntry] -> H.Html
 renderMoods' moods =
-  H.docTypeHtml $ do
-    H.body $ do
-      H.h1 "Moods"
-      H.meta H.! charset "UTF-8"
-      H.ul $ do
-        mapM_ H.li $ fmap show moods
+  case moods of
+    Right suc ->
+      H.docTypeHtml $ do
+        H.body $ do
+          H.h1 "Moods"
+          H.meta H.! charset "UTF-8"
+          H.ul $ do
+            mapM_ H.li $ fmap renderMood suc
+    Left err -> H.docTypeHtml $ do
+      H.body $ do
+        H.h1 "Moods"
+        H.meta H.! charset "UTF-8"
+        H.ul $ do
+          mapM_ H.li $ fmap H.toHtml err
 
 -- | This runs a web application, at the given port.
 runApp :: Int -> IO ()
@@ -75,5 +88,5 @@ main = do
   targetFile <- readFileLBS "src/moods.jsonl"
   let listOfMoods = moodParse targetFile
    in case listOfMoods of
-        Right success -> runApp 7000
+        Right success -> runApp 8000
         Left err -> print err
