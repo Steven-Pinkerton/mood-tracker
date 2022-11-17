@@ -29,9 +29,14 @@ instance FromJSON MoodEntry where
   parseJSON = withObject "moodRecord" $ \o -> do
     when' <- o .: "when"
     moodWhat <- o .: "mood"
-    moodWhen <- parseTimeM False defaultTimeLocale "%Y-%m-%d %a %H:%M" when'
+    moodWhen <- myParseTimeM when'
     return MoodEntry {moodWhen, moodWhat}
 
 --Consider Traversal, build it with regards to moodPrase
 moodParse :: B.ByteString -> Either String [MoodEntry]
 moodParse x = traverse eitherDecode (BL.lines x)
+
+
+--A concrete implementation specialised to our use case, from ParseTimeM.
+myParseTimeM :: (MonadFail m) => String -> m UTCTime
+myParseTimeM = parseTimeM False defaultTimeLocale "%Y-%m-%d %a %H:%M"

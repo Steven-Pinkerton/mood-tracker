@@ -105,7 +105,8 @@ common shared
   default-language:   Haskell2010
 
 library
-  import: shared
+  import:          shared
+  exposed-modules: MoodTracker.Parser
 
 executable mood-tracker
   import:  shared
