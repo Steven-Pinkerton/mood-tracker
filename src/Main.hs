@@ -25,5 +25,5 @@ main = do
   targetFile <- readFileLBS "src/moods.jsonl"
   let listOfMoods = moodParse targetFile
    in case listOfMoods of
-        Right _ -> runApp 8000
+        Right _ -> runApp 9000
         Left err -> print err

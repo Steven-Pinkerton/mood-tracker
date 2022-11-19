@@ -36,7 +36,6 @@ instance FromJSON MoodEntry where
 moodParse :: B.ByteString -> Either String [MoodEntry]
 moodParse x = traverse eitherDecode (BL.lines x)
 
-
 --A concrete implementation specialised to our use case, from ParseTimeM.
 myParseTimeM :: (MonadFail m) => String -> m UTCTime
 myParseTimeM = parseTimeM False defaultTimeLocale "%Y-%m-%d %a %H:%M"
