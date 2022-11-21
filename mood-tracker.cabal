@@ -115,6 +115,7 @@ executable mood-tracker
 test-suite my-tests
   import:         shared
   main-is:        Spec.hs
+  ghc-options:    -main-is Spec
   type:           exitcode-stdio-1.0
   hs-source-dirs: tests
   other-modules:  MoodTracker.Parser
