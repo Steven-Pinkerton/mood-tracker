@@ -16,10 +16,9 @@ testText =
 
 main :: IO ()
 main = do
-  let file = encodeUtf8 testText
   hspec $ do
     describe "Main" $ do
       it "moodParse works" $ do
-        moodParse file
+        moodParse (encodeUtf8 testText)
           `shouldBe` Right
             [MoodEntry {moodWhen = fromJust $ myParseTimeM "2022-10-09 Mon 11:51", moodWhat = Bad}, MoodEntry {moodWhen = fromJust $ myParseTimeM "2022-11-02 Sat 09:10", moodWhat = Good}]
