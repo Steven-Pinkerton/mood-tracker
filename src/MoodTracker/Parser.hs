@@ -5,7 +5,6 @@
 module MoodTracker.Parser where
 
 import Data.Aeson (FromJSON (parseJSON), ToJSON, eitherDecode, withObject, (.:))
-import Data.ByteString.Lazy qualified as B
 import Data.ByteString.Lazy.Char8 qualified as BL
 import Data.Time (UTCTime, defaultTimeLocale, parseTimeM)
 
@@ -31,7 +30,7 @@ instance FromJSON MoodEntry where
     return MoodEntry {moodWhen, moodWhat}
 
 --Consider Traversal, build it with regards to moodPrase
-moodParse :: B.ByteString -> Either String [MoodEntry]
+moodParse :: BL.ByteString -> Either String [MoodEntry]
 moodParse x = traverse eitherDecode (BL.lines x)
 
 --A concrete implementation specialised to our use case, from ParseTimeM.
