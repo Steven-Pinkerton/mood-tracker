@@ -8,8 +8,6 @@ import Data.Aeson (FromJSON (parseJSON), ToJSON, eitherDecode, withObject, (.:))
 import Data.ByteString.Lazy qualified as B
 import Data.ByteString.Lazy.Char8 qualified as BL
 import Data.Time (UTCTime, defaultTimeLocale, parseTimeM)
-import GHC.Generics ()
-import Relude.List.Reexport ()
 
 data Mood = Bad | Neutral | Good | Great | Excellent
   deriving stock (Show, Eq, Read, Generic)

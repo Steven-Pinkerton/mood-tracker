@@ -2,7 +2,6 @@
 
 module Spec where
 
-import Data.ByteString.Lazy ()
 import Data.Maybe (fromJust)
 import MoodTracker.Parser (Mood (Bad, Good), MoodEntry (MoodEntry), moodParse, moodWhat, moodWhen, myParseTimeM)
 import NeatInterpolation (trimming)
