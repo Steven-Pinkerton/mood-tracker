@@ -20,11 +20,13 @@ renderMoods moods =
       H.ul $ do
         mapM_ H.li $ fmap renderMoodEntry moods
 
+-- | This takes an error and returns it as HTML.
 renderError :: Text -> H.Html
 renderError error' = do
   H.span $ do
     H.toHtml (show error' :: String)
 
+-- | This serves errors that have arisen when trying to read a moodEntry as HTML.
 renderErrors :: String -> H.Html
 renderErrors errors =
   H.docTypeHtml $ do
