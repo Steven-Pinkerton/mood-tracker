@@ -29,7 +29,6 @@ instance FromJSON MoodEntry where
     moodWhen <- myParseTimeM when'
     return MoodEntry {moodWhen, moodWhat}
 
-
 moodParse :: BL.ByteString -> Either String [MoodEntry]
 moodParse x = traverse eitherDecode (BL.lines x)
 

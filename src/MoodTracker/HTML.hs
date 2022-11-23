@@ -13,12 +13,12 @@ renderMoodEntry moodentry = do
 -- | This serves Html to an application.
 renderMoods :: [MoodEntry] -> H.Html
 renderMoods moods =
-      H.docTypeHtml $ do
-        H.body $ do
-          H.h1 "Moods"
-          H.meta H.! charset "UTF-8"
-          H.ul $ do
-            mapM_ H.li $ fmap renderMoodEntry moods
+  H.docTypeHtml $ do
+    H.body $ do
+      H.h1 "Moods"
+      H.meta H.! charset "UTF-8"
+      H.ul $ do
+        mapM_ H.li $ fmap renderMoodEntry moods
 
 renderError :: Text -> H.Html
 renderError error' = do
@@ -26,10 +26,10 @@ renderError error' = do
     H.toHtml (show error' :: String)
 
 renderErrors :: String -> H.Html
-renderErrors errors = 
-     H.docTypeHtml $ do
-       H.body $ do
-         H.h1 "Errors"
-         H.meta H.! charset "UTF-8"
-         H.ul $ do
-           mapM_ H.li $ fmap renderError (lines (toText errors))
+renderErrors errors =
+  H.docTypeHtml $ do
+    H.body $ do
+      H.h1 "Errors"
+      H.meta H.! charset "UTF-8"
+      H.ul $ do
+        mapM_ H.li $ fmap renderError (lines (toText errors))
