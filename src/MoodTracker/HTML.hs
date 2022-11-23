@@ -29,7 +29,7 @@ renderErrors :: String -> H.Html
 renderErrors errors = 
      H.docTypeHtml $ do
        H.body $ do
-         H.h1 "Error"
+         H.h1 "Errors"
          H.meta H.! charset "UTF-8"
          H.ul $ do
            mapM_ H.li $ fmap renderError (lines (toText errors))
