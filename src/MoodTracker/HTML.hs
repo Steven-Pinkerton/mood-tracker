@@ -5,25 +5,31 @@ import Text.Blaze.Html5.Attributes (charset)
 
 import MoodTracker.Parser (MoodEntry)
 
-renderMood :: MoodEntry -> H.Html
-renderMood x = do
+renderMoodEntry :: MoodEntry -> H.Html
+renderMoodEntry moodentry = do
   H.span $ do
-    H.toHtml (show x :: String)
+    H.toHtml (show moodentry :: String)
 
 -- | This serves Html to an application.
-renderMoods' :: Either String [MoodEntry] -> H.Html
-renderMoods' moods =
-  case moods of
-    Right suc ->
+renderMoods :: [MoodEntry] -> H.Html
+renderMoods moods =
       H.docTypeHtml $ do
         H.body $ do
           H.h1 "Moods"
           H.meta H.! charset "UTF-8"
           H.ul $ do
-            mapM_ H.li $ fmap renderMood suc
-    Left err -> H.docTypeHtml $ do
-      H.body $ do
-        H.h1 "Moods"
-        H.meta H.! charset "UTF-8"
-        H.ul $ do
-          mapM_ H.li $ fmap H.toHtml err
+            mapM_ H.li $ fmap renderMoodEntry moods
+
+renderError :: Text -> H.Html
+renderError error' = do
+  H.span $ do
+    H.toHtml (show error' :: String)
+
+renderErrors :: String -> H.Html
+renderErrors errors = 
+     H.docTypeHtml $ do
+       H.body $ do
+         H.h1 "Error"
+         H.meta H.! charset "UTF-8"
+         H.ul $ do
+           mapM_ H.li $ fmap renderError (lines (toText errors))
