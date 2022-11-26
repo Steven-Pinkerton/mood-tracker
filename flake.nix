@@ -25,7 +25,7 @@
               treefmt;
           } // config.treefmt.formatters;
           # overrides = self: super: {}
-          hlsCheck.enable = false;
+          hlsCheck.enable = true;
           hlintCheck.enable = true;
         };
         treefmt.formatters = {
