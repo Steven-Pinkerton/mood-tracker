@@ -1,6 +1,4 @@
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 module MoodTracker.Parser where
 
@@ -21,14 +19,16 @@ data MoodEntry = MoodEntry
   deriving stock (Show, Eq, Generic)
 instance ToJSON MoodEntry
 
---We can alter this to do more then just instantly derive a UTCTime. Alternatively we can alter the format of the file itself.
+-- We can alter this to do more then just instantly derive a UTCTime. Alternatively we can alter the format of the file itself.
 instance FromJSON MoodEntry where
   parseJSON = withObject "moodRecord" $ \o -> do
-    when' <- o .: "when"
     moodWhat <- o .: "mood"
-    moodWhen <- parseTimeM False defaultTimeLocale "%Y-%m-%d %a %H:%M" when'
+    moodWhen <-
+      parseTimeM False defaultTimeLocale "%Y-%m-%d %a %H:%M"
+        =<< o
+        .: "when"
     return MoodEntry {moodWhen, moodWhat}
 
--- | This function will either return an error message or a list of MoodEntries.
+-- | Parse a mood file.
 parseMoodEntries :: BL.ByteString -> Either String [MoodEntry]
-parseMoodEntries x = traverse eitherDecode (BL.lines x)
+parseMoodEntries = traverse eitherDecode . BL.lines
