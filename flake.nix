@@ -34,6 +34,7 @@
             cabal-fmt
             fourmolu;
         };
+        packages.default = config.packages.mood-tracker;
       };
     };
 }
