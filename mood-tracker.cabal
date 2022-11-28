@@ -2,9 +2,9 @@ cabal-version:      2.4
 name:               mood-tracker
 version:            0.1.0.0
 license:            MIT
-copyright:          2022 Sridhar Ratnakumar
-maintainer:         srid@srid.ca
-author:             Sridhar Ratnakumar
+copyright:          2022 Steven Pinkerton
+maintainer:         steven.a.pinkerton@gmail.com
+author:             Steven Pinkerton
 category:           Web
 
 -- TODO: Before hackage release.
