@@ -19,7 +19,7 @@
       ];
       perSystem = { self', config, pkgs, ... }: {
         haskellProjects.default = {
-          root = ./.;
+          packages.mood-tracker.root = ./.;
           buildTools = hp: {
             inherit (pkgs)
               treefmt;
