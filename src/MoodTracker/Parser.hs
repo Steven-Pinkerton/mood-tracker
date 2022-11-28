@@ -30,5 +30,5 @@ instance FromJSON MoodEntry where
     return MoodEntry {moodWhen, moodWhat}
 
 -- | This function will either return an error message or a list of MoodEntries.
-eitherStringOrMood :: BL.ByteString -> Either String [MoodEntry]
-eitherStringOrMood x = traverse eitherDecode (BL.lines x)
+parseMoodEntries :: BL.ByteString -> Either String [MoodEntry]
+parseMoodEntries x = traverse eitherDecode (BL.lines x)
