@@ -3,9 +3,9 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    flake-parts.inputs.nixpkgs.follows = "nixpkgs";
     haskell-flake.url = "github:srid/haskell-flake";
     treefmt-flake.url = "github:srid/treefmt-flake";
+    check-flake.url = "github:srid/check-flake";
   };
 
   outputs = inputs@{ self, nixpkgs, flake-parts, ... }:
@@ -14,10 +14,11 @@
       imports = [
         inputs.haskell-flake.flakeModule
         inputs.treefmt-flake.flakeModule
+        inputs.check-flake.flakeModule
       ];
       perSystem = { self', config, pkgs, ... }: {
         haskellProjects.default = {
-          root = ./.;
+          packages.mood-tracker.root = ./.;
           buildTools = hp: {
             inherit (pkgs)
               treefmt;
@@ -33,6 +34,7 @@
             cabal-fmt
             fourmolu;
         };
+        packages.default = config.packages.mood-tracker;
       };
     };
 }

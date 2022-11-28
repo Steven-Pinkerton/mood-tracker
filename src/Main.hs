@@ -1,14 +1,21 @@
 module Main where
 
-import Main.Utf8 qualified as Utf8
+import MoodTracker.HTML (renderData)
+import MoodTracker.Parser (parseMoodEntries)
+import Network.HTTP.Types (status200)
+import Network.Wai (Application, responseLBS)
+import Network.Wai.Handler.Warp (run)
+import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
 
-{- |
- Main entry point.
+app' :: Application
+app' _request respond = do
+  fileContents <- readFileLBS "src/moods.jsonl"
+  respondHtml . renderHtml . renderData $
+    parseMoodEntries fileContents
+  where
+    respondHtml = respond . responseLBS status200 []
 
- The `bin/run` script will invoke this function.
--}
 main :: IO ()
 main = do
-  -- For withUtf8, see https://serokell.io/blog/haskell-with-utf8
-  Utf8.withUtf8 $ do
-    putTextLn "Hello 🌎"
+  putStrLn "Running HTTP server at http://127.0.0.1:3000"
+  run 3000 app'

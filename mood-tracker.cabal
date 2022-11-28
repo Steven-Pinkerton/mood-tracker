@@ -2,9 +2,9 @@ cabal-version:      2.4
 name:               mood-tracker
 version:            0.1.0.0
 license:            MIT
-copyright:          2022 Sridhar Ratnakumar
-maintainer:         srid@srid.ca
-author:             Sridhar Ratnakumar
+copyright:          2022 Steven Pinkerton
+maintainer:         steven.a.pinkerton@gmail.com
+author:             Steven Pinkerton
 category:           Web
 
 -- TODO: Before hackage release.
@@ -26,6 +26,10 @@ common shared
     -Wall -Wincomplete-record-updates -Wincomplete-uni-patterns
     -Wmissing-deriving-strategies -Wunused-foralls -Wunused-foralls
     -fprint-explicit-foralls -fprint-explicit-kinds
+
+  other-modules:
+    MoodTracker.HTML
+    MoodTracker.Parser
 
   mixins:
     base hiding (Prelude),
@@ -76,16 +80,26 @@ common shared
   build-depends:
     , aeson
     , async
-    , base          >=4.13.0.0 && <=4.18.0.0
+    , base                >=4.13.0.0 && <4.18.0.0.0
+    , blaze-builder
+    , blaze-html
+    , blaze-markup
+    , bytestring
     , data-default
     , directory
     , filepath
+    , http-types
+    , list-extras
     , mtl
+    , neat-interpolation
     , optics-core
     , profunctors
-    , relude        >=1.0
+    , relude              >=1.0
     , shower
+    , text
     , time
+    , wai
+    , warp
     , with-utf8
 
   hs-source-dirs:     src
@@ -94,3 +108,14 @@ common shared
 executable mood-tracker
   import:  shared
   main-is: Main.hs
+
+test-suite my-tests
+  import:         shared
+  main-is:        Spec.hs
+  ghc-options:    -main-is Spec
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: tests
+  other-modules:  MoodTracker.Parser
+  build-depends:
+    , hspec
+    , hspec-discover

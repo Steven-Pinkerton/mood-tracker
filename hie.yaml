@@ -2,3 +2,5 @@ cradle:
   cabal:
     - path: "src"
       component: "exe:mood-tracker"
+    - path: "tests"
+      component: "test:my-tests"
