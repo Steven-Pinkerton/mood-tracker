@@ -6,9 +6,10 @@
     haskell-flake.url = "github:srid/haskell-flake";
     treefmt-flake.url = "github:srid/treefmt-flake";
     check-flake.url = "github:srid/check-flake";
+    deploy-rs.url = "github:serokell/deploy-rs";
   };
 
-  outputs = inputs@{ self, nixpkgs, flake-parts, ... }:
+  outputs = inputs@{ self, nixpkgs, flake-parts, deploy-rs, ... }:
     flake-parts.lib.mkFlake { inherit self; } {
       systems = nixpkgs.lib.systems.flakeExposed;
       imports = [
@@ -34,7 +35,25 @@
             cabal-fmt
             fourmolu;
         };
+
+        nixosConfiguration.mood-tracker = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [ ./configuration.nix ];
+        };
+
+        defaultPackage.x86_64-linux = import ./src/Main.hs;
+
+        deploy.nodes.mood-tracker = {
+          profiles = {
+            system = {
+              user = "root";
+              sshUser = "root";
+              path = deploy-rs.lub.x86_64-linux.activate.nixos self.nixosConfiguration.mood-tracker;
+            };
+            };
+          };
+        };
+        checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
         packages.default = config.packages.mood-tracker;
       };
-    };
-}
+    }
