@@ -1,7 +1,6 @@
 { config, pkgs, lib, ... }:
 
 {
-  imports = [ <nixpkgs/nixos/modules/virtualisation/openstack-config.nix> ];
 
   nixpkgs.config =
     {
@@ -38,7 +37,7 @@
 
   time.timeZone = "Europe/Amsterdam";
 
-  i18n.defaultlocale = "en_GB.UTF-8";
+  i18n.defaultLocale = "en_GB.UTF-8";
   console = {
     font = "Lat2-Terminus16";
     keyMap = "uk";

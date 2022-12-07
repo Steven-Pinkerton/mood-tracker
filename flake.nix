@@ -35,25 +35,30 @@
             cabal-fmt
             fourmolu;
         };
+        /* End of persystem this was changed prior to that including the later in persystem resulted in a different error*/
 
-        nixosConfiguration.mood-tracker = nixpkgs.lib.nixosSystem {
+      };
+      flake = {
+        nixosConfigurations.mood-tracker = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          modules = [ ./configuration.nix ];
+          modules = [
+            ./configuration.nix
+            ({ config, pkgs, ... }: {
+              imports = [ "${nixpkgs}/nixos/modules/virtualisation/openstack-config.nix" ];
+            })
+          ];
         };
-
-        defaultPackage.x86_64-linux = import ./src/Main.hs;
 
         deploy.nodes.mood-tracker = {
           profiles = {
             system = {
               user = "root";
               sshUser = "root";
-              path = deploy-rs.lub.x86_64-linux.activate.nixos self.nixosConfiguration.mood-tracker;
-            };
+              path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.mood-tracker;
             };
           };
         };
         checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
-        packages.default = config.packages.mood-tracker;
       };
-    }
+    };
+}
