@@ -49,7 +49,10 @@
           ];
         };
 
+        
+
         deploy.nodes.mood-tracker = {
+          hostname = "root";
           profiles = {
             system = {
               user = "root";
