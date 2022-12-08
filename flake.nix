@@ -11,7 +11,7 @@
 
   outputs = inputs@{ self, nixpkgs, flake-parts, deploy-rs, ... }:
     flake-parts.lib.mkFlake { inherit self; } {
-      systems = [ "x86_64-linux" ];
+      systems = nixpkgs.lib.systems.flakeExposed;
       imports = [
         inputs.haskell-flake.flakeModule
         inputs.treefmt-flake.flakeModule
@@ -38,7 +38,6 @@
         };
 
         packages.default = self'.packages.mood-tracker;
-
       };
       flake = {
         nixosConfigurations.mood-tracker = nixpkgs.lib.nixosSystem {
@@ -53,7 +52,7 @@
         };
 
         deploy.nodes.mood-tracker = {
-          hostname = "root";
+          hostname = "server";
           profiles = {
             system = {
               user = "root";

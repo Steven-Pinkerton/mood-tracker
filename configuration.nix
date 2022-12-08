@@ -2,11 +2,6 @@
 
 {
 
-  nixpkgs.config =
-    {
-      allowUnfree = true;
-    };
-
   networking.firewall = {
     enable = true;
     allowedTCPPorts = [ 22 443 19999 3000 ];
@@ -15,7 +10,6 @@
   services.openssh = {
     enable = true;
     passwordAuthentication = false;
-
   };
 
   users.users."root".openssh.authorizedKeys.keys = [
