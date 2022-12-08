@@ -37,7 +37,7 @@
 
         };
         /* End of persystem this was changed prior to that including the later in persystem resulted in a different error*/
-      packages.default = self'.packages.mood-tracker;
+        packages.default = self'.packages.mood-tracker;
 
       };
       flake = {
