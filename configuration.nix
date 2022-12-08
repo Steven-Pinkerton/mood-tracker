@@ -18,7 +18,6 @@
 
   services.netdata = {
     enable = true;
-    user = "root";
   };
 
   environment = {
