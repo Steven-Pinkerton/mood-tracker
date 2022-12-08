@@ -11,7 +11,7 @@
 
   outputs = inputs@{ self, nixpkgs, flake-parts, deploy-rs, ... }:
     flake-parts.lib.mkFlake { inherit self; } {
-      systems = nixpkgs.lib.systems.flakeExposed;
+      systems = [ "x86_64-linux" ];
       imports = [
         inputs.haskell-flake.flakeModule
         inputs.treefmt-flake.flakeModule
@@ -34,8 +34,10 @@
           inherit (pkgs.haskellPackages)
             cabal-fmt
             fourmolu;
+
         };
         /* End of persystem this was changed prior to that including the later in persystem resulted in a different error*/
+      packages.default = self'.packages.mood-tracker;
 
       };
       flake = {
@@ -45,11 +47,10 @@
             ./configuration.nix
             ({ config, pkgs, ... }: {
               imports = [ "${nixpkgs}/nixos/modules/virtualisation/openstack-config.nix" ];
+              environment.systemPackages = [ self.packages.x86_64-linux.mood-tracker ];
             })
           ];
         };
-
-        
 
         deploy.nodes.mood-tracker = {
           hostname = "root";
