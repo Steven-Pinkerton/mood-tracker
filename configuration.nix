@@ -20,6 +20,11 @@
     enable = true;
   };
 
+  /* Nginx configuration. Presently virtualHosts is undefined, and root is null this will be changed later. */
+  services.nginx = {
+    enable = true;
+  };
+
   environment = {
     variables = {
       EDITOR = "nvim";

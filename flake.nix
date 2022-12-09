@@ -52,7 +52,7 @@
         };
 
         deploy.nodes.mood-tracker = {
-          hostname = "server";
+          hostname = "mood-tracker-server";
           profiles = {
             system = {
               user = "root";
