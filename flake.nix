@@ -52,7 +52,7 @@
         };
 
         deploy.nodes.mood-tracker = {
-          hostname = "Amsha";
+          hostname = "193.16.42.121";
           profiles = {
             system = {
               user = "root";
