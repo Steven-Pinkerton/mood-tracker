@@ -13,7 +13,7 @@
   };
 
   users.users."root".openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAACNzaC1lZDI1NTE5AAAAIPwjDcLZ5jrK3XL5dF7eVb+9wPWqUBLf4NCuRzmRiteT steven@DESKTOP-4IURNHR"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPwjDcLZ5jrK3XL5dF7eVb+9wPWqUBLf4NCuRzmRiteT steven@DESKTOP-4IURNHR"
   ];
 
   services.netdata = {
