@@ -60,7 +60,11 @@
             };
           };
         };
-        #checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
+        checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
+        #We set this to false in order to test the hypothesis that this is a known error. Auto-rollback still applies
+        magicRollback = false;
+        #We also set this setting to true, as if it is an issue with the response time, building the system localy to the remote may resolve this.
+        remoteBuild = true;
       };
     };
 }
