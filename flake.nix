@@ -43,11 +43,10 @@
         nixosConfigurations.mood-tracker = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
-            ./configuration.nix
-            ({ config, pkgs, ... }: {
+            {
               imports = [ "${nixpkgs}/nixos/modules/virtualisation/openstack-config.nix" ];
               environment.systemPackages = [ self.packages.x86_64-linux.mood-tracker ];
-            })
+            }
           ];
         };
 
@@ -61,7 +60,7 @@
             };
           };
         };
-        checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
+        #checks = builtins.mapAttrs (system: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
       };
     };
 }
