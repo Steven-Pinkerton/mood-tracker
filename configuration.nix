@@ -45,7 +45,4 @@
     neovim
     wget
   ];
-  programs.bash.shellInit = ''
-    TERM=xterm
-  '';
 }
